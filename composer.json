@@ -1,0 +1,20 @@
+{
+    "name": "layer/api",
+    "description": "router",
+    "authors": [
+        {
+            "name": "Layer-Etna",
+            "email": "alary20@hotmail.fr"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "src"
+        }
+    },
+    "require": {
+      "ext-json": "*",
+        "firebase/php-jwt": "^5.1",
+      "ext-apache": "*"
+    }
+}
