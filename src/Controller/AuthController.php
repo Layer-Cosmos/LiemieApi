@@ -12,8 +12,6 @@ use App\Entity\User;
 class AuthController extends Controller
 {
     public function connexion() {
-
-        var_dump($_COOKIE);
         $auth = new Authentication();
 
         $user = $this->getUser();
@@ -24,17 +22,21 @@ class AuthController extends Controller
             throw new HttpException("Unauthorized", 401);
         }
 
-        $this->response("");
+        $this->send();
     }
 
     public function token() {
         $auth = new Authentication();
 
-        if($auth->hasRefreshToken($this->request, $this->response)){
-
+        if($auth->hasRefreshToken($this->request, $this->response)) {
+            if(!$auth->hasValidRefreshToken($this->request, $this->response)) {
+                throw new HttpException("Unauthorized", 401);
+            }
         } else {
             throw new HttpException("Unauthorized", 401);
         }
+
+        $this->send();
     }
 
     private function getUser() {

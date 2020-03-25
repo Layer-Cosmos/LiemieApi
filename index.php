@@ -7,6 +7,7 @@ $router->get('/', "App#index");
 $router->get('/user', "User#index");
 $router->get('/visite', "Visite#index");
 $router->get('/patient', "Patient#index");
+$router->get('/auth', "Auth#token");
 $router->post('/user', "User#connexion");
 $router->post('/auth', "Auth#connexion");
 //$router->get('/posts/:id', "Posts#show");

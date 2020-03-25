@@ -10,6 +10,7 @@ use App\Database\Database;
 class VisiteController extends Controller
 {
     public function index() {
+        $this->isAuth();
         $pdo = new Database("api");
 
         $res = $pdo->query("SELECT * FROM visite");

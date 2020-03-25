@@ -11,10 +11,11 @@ class PatientController extends Controller
 {
     public function index()
     {
+        $this->isAuth();
         $pdo = new Database("api");
 
         $res = $pdo->query("SELECT * FROM patient");
 
-        echo json_encode($res);
+        $this->response(json_encode($res));
     }
 }

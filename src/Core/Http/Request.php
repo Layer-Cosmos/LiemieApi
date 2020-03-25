@@ -33,7 +33,7 @@ class Request
     }
 
     public function getRefreshToken() {
-        return "";
+        return $this->cookies["Refresh"];
     }
 
     public function hasRefreshToken() {

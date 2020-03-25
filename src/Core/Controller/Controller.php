@@ -30,6 +30,10 @@ class Controller
         $this->response->exec();
     }
 
+    public function send() {
+        $this->response->exec();
+    }
+
     public function isAuth() {
         $auth = new Authentication();
         if($auth->hasToken($this->request, $this->response)) {

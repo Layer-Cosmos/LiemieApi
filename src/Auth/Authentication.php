@@ -45,7 +45,36 @@ class Authentication
     }
 
     public function hasRefreshToken(Request $request, Response $response) {
+        if($request->hasToken()) {
+            return true;
+        }
+        $response->setUnauthorized();
+        return false;
+    }
 
+    public function hasValidRefreshToken(Request $request, Response $response) {
+        $refreshToken = $request->getRefreshToken();
+
+        $pdo = new Database("api");
+        if($request->hasToken()) {
+            $body = $this->decodeJwt($request->getToken());
+
+            $user = new User();
+            $user->setId($body->user_id);
+            $user->setMail($body->user_mail);
+            $this->user = $user;
+
+            $res = $pdo->prepare("SELECT token FROM token WHERE id = ?", array($body->user_id));
+
+            if($res["token"] == $refreshToken) {
+                $this->createToken($response);
+                return true;
+            } else {
+                $response->setUnauthorized();
+                return false;
+            }
+        }
+        return false;
     }
 
     public function createToken(Response $response) {
@@ -53,7 +82,7 @@ class Authentication
         $token = [
             'user_id' => $this->user->getId(),
             'user_mail' => $this->user->getMail(),
-            'exp' => time() + 120
+            'exp' => time() + 60
         ];
 
         $token = JWT::encode($token, $key);
@@ -66,7 +95,6 @@ class Authentication
     private function createRefreshToken(Response $response) {
 
         $pdo = new Database("api");
-
 
         $token = [
             'user_id' => $this->user->getId(),
@@ -90,5 +118,22 @@ class Authentication
 
 
         $response->createCookie("Refresh", $token, 86400);
+        $this->okRefreshJson($response);
+    }
+
+    private function decodeJwt($token) {
+        $tks = explode('.', $token);
+        list($headb64, $bodyb64, $cryptob64) = $tks;
+
+        return json_decode(JWT::urlsafeB64Decode($bodyb64));
+
+    }
+
+    private function okRefreshJson(Response $response) {
+        $json = [
+            'Auth' => "Ok"
+        ];
+
+        $response->setContent(json_encode($json));
     }
 }
