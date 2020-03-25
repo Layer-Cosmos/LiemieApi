@@ -1,10 +1,10 @@
 <?php
 
-
 namespace App\Controller;
 
-
+use App\Auth\Authentication;
 use App\Core\Controller\Controller;
+use App\Core\Http\HttpException;
 use App\Database\Database;
 use App\Entity\User;
 use Firebase\JWT\JWT;
@@ -14,51 +14,18 @@ class UserController extends Controller
 
     public function index() {
 
-        if($this->isAuth()) {
-            $pdo = new Database("api");
+        $this->isAuth();
 
-            $res = $pdo->query("SELECT * FROM user");
+        $pdo = new Database("api");
 
-            echo json_encode($res);
-        }
+        $res = $pdo->query("SELECT * FROM user");
 
-        $this->response("test");
+        $this->response(json_encode($res));
     }
 
     public function connexion() {
-        $pdo = new Database("api");
 
-        $user = $this->getUser();
-        $res = $pdo->prepare("SELECT * FROM user WHERE mail = ? AND password = ?", array($user->getMail(), $user->getPassword()), "App\Entity\User");
-
-        //echo "1";
-        if(empty($res)){
-            http_response_code(401);
-        } else {
-            http_response_code(200);
-
-        }
-
-        $key = "Liemie";
-        $token = [
-            'user_id' => 1,
-            'user_mail' => $user->getMail(),
-            'exp' => time() + 3660
-        ];
-
-        $token = JWT::encode($token, $key);
-
-
-        header("Authorization: Bearer $token");
-        header("Content-Type: application/json");
-
-        $this->response($token);
     }
 
-    private function getUser() {
-        $json = file_get_contents('php://input');
-        $post = json_decode($json);
 
-        return User::build($post->mail, $post->password);
-    }
 }

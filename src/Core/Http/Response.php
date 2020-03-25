@@ -12,8 +12,7 @@ class Response
     private $content;
     private $error;
 
-    public function __construct()
-    {
+    public function __construct() {
         header_remove();
         $this->headers["Date"] = date(DATE_RFC2822);
         $this->headers["Server"] = $_SERVER["SERVER_SOFTWARE"];
@@ -23,6 +22,10 @@ class Response
 
     public function setContent($content) {
         $this->content = $content;
+    }
+
+    public function setHeader($header, $message) {
+        $this->headers[$header] = $message;
     }
 
     public function setUnauthorized() {
@@ -37,10 +40,16 @@ class Response
         $this->error->setStatus("498")->setTitle("Token expired/invalid");
     }
 
-    public function setHTTP($code, $message) {
+    public function setHTTP($code, $message, $error = false) {
         $this->headers["HTTP/1.1"] = "$code $message";
-        $this->error = new Error();
-        $this->error->setStatus($code)->setTitle($message);
+        if($error) {
+            $this->error = new Error();
+            $this->error->setStatus($code)->setTitle($message);
+        }
+    }
+
+    public function createCookie($name, $value, $expire = 3600) {
+        setcookie($name, $value, time() + $expire);
     }
 
     public function exec() {
@@ -54,4 +63,6 @@ class Response
             echo $this->content;
         }
     }
+
+
 }

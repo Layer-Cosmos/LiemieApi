@@ -43,7 +43,7 @@ class Database
         return $datas;
     }
 
-    public function prepare($sql, $attributes, $class_name) {
+    public function prepare($sql, $attributes, $class_name = "") {
         $req = $this->getPDO()->prepare($sql);
         $res = $req->execute($attributes);
         if(

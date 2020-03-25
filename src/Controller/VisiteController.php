@@ -14,6 +14,8 @@ class VisiteController extends Controller
 
         $res = $pdo->query("SELECT * FROM visite");
 
-        echo json_encode($res);
+
+
+        $this->response(json_encode($res));
     }
 }

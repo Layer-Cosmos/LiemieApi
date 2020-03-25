@@ -4,6 +4,8 @@
 namespace App\Core\Controller;
 
 
+use App\Auth\Authentication;
+use App\Core\Http\HttpException;
 use App\Core\Http\Request;
 use App\Core\Http\Response;
 
@@ -19,7 +21,7 @@ class Controller
      */
     public function __construct()
     {
-        $this->request = new Request(apache_request_headers());
+        $this->request = new Request();
         $this->response = new Response();
     }
 
@@ -29,18 +31,10 @@ class Controller
     }
 
     public function isAuth() {
-        try {
-            $token = JWT::decode($this->request->getToken(), "Liemie", array('HS256'));
-        } catch (\Exception $e) {
-            $this->response->setUnauthorized();
-        }
-
-        if(isset($token)) {
+        $auth = new Authentication();
+        if($auth->hasToken($this->request, $this->response)) {
             return true;
         }
-
-        return false;
+        throw new HttpException("Unauthorized", 401);
     }
-
-
 }
