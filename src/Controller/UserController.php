@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\App;
 use App\Auth\Authentication;
 use App\Core\Controller\Controller;
 use App\Core\Http\HttpException;
 use App\Database\Database;
-use App\Entity\User;
+use App\Entity\UserEntity;
 use Firebase\JWT\JWT;
 
 class UserController extends Controller
@@ -16,9 +17,7 @@ class UserController extends Controller
 
         $this->isAuth();
 
-        $pdo = new Database("api");
-
-        $res = $pdo->query("SELECT * FROM user");
+        $res = App::getInstance()->getTable("user")->all();
 
         $this->response(json_encode($res));
     }

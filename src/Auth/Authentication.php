@@ -4,33 +4,32 @@
 namespace App\Auth;
 
 
+use App\App;
 use App\Core\Http\Request;
 use App\Core\Http\Response;
 use App\Database\Database;
-use App\Entity\User;
+use App\Entity\UserEntity;
 use Firebase\JWT\JWT;
 
 class Authentication
 {
     private $user;
 
-    public function checkUser(User $user) {
+    public function checkUser(UserEntity $user) {
 
         $this->user = $user;
 
-        $pdo = new Database("api");
+        $res = App::getInstance()->getTable("user")->checkUser($this->user);
 
-        $res = $pdo->prepare("SELECT * FROM user WHERE mail = ? AND password = ?", array($user->getMail(), $user->getPassword()), "App\Entity\User");
-
-        if(empty($res)) {
-            return false;
-        } else {
-            $this->user = $res;
+        if($res) {
+            $this->user = App::getInstance()->getTable("user")->getUserByMail($this->user->getMail());;
             return true;
         }
+
+        return false;
     }
 
-    public function hasToken(Request $request, Response $response) {
+    public function hasToken(Request $request, Response $response) : bool {
         if($request->hasToken()) {
             try {
                 $token = JWT::decode($request->getToken(), "Liemie", array('HS256'));
@@ -59,7 +58,7 @@ class Authentication
         if($request->hasToken()) {
             $body = $this->decodeJwt($request->getToken());
 
-            $user = new User();
+            $user = new UserEntity();
             $user->setId($body->user_id);
             $user->setMail($body->user_mail);
             $this->user = $user;
@@ -82,7 +81,7 @@ class Authentication
         $token = [
             'user_id' => $this->user->getId(),
             'user_mail' => $this->user->getMail(),
-            'exp' => time() + 60
+            'exp' => time() + 900
         ];
 
         $token = JWT::encode($token, $key);

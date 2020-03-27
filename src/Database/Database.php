@@ -23,7 +23,7 @@ class Database
 
     public function getPDO() {
         if($this->pdo === null) {
-            $pdo = new PDO("mysql:dbname=api;host=localhost", 'root', '');
+            $pdo = new PDO("mysql:dbname=$this->db_name;host=$this->db_host", $this->db_user, $this->db_pass);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo = $pdo;
         }
@@ -31,9 +31,14 @@ class Database
         return $this->pdo;
     }
 
-    public function query($sql, $one = null) {
+    public function query($sql, $class_name = "", $one = null) {
         $req = $this->getPDO()->query($sql);
-        $req->setFetchMode(PDO::FETCH_OBJ);
+        if(empty($class_name)) {
+            $req->setFetchMode(PDO::FETCH_OBJ);
+        } else {
+            $req->setFetchMode(PDO::FETCH_CLASS, $class_name);
+        }
+
         if($one) {
             $datas = $req->fetch();
         } else {
@@ -43,7 +48,7 @@ class Database
         return $datas;
     }
 
-    public function prepare($sql, $attributes, $class_name = "") {
+    public function prepare($sql, $attributes, $class_name = "", $one = false) {
         $req = $this->getPDO()->prepare($sql);
         $res = $req->execute($attributes);
         if(

@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Auth\Authentication;
 use App\Core\Controller\Controller;
 use App\Core\Http\HttpException;
-use App\Entity\User;
+use App\Entity\UserEntity;
 
 class AuthController extends Controller
 {
@@ -25,6 +25,10 @@ class AuthController extends Controller
         $this->send();
     }
 
+    public function inscription() {
+
+    }
+
     public function token() {
         $auth = new Authentication();
 
@@ -40,6 +44,6 @@ class AuthController extends Controller
     }
 
     private function getUser() {
-        return User::build($this->request->getContents()->mail, $this->request->getContents()->password);
+        return UserEntity::build($this->request->getContents()->mail, $this->request->getContents()->password);
     }
 }

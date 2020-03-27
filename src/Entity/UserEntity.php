@@ -7,7 +7,7 @@ namespace App\Entity;
 use App\Core\Entity\Entity;
 use JsonSerializable;
 
-class User extends Entity implements JsonSerializable
+class UserEntity extends Entity implements JsonSerializable
 {
     private $id;
     private $mail;
@@ -15,7 +15,7 @@ class User extends Entity implements JsonSerializable
 
 
     public static function build($mail = "", $password = "") {
-        $user = new User;
+        $user = new UserEntity;
         $user->setMail("$mail");
         $user->setPassword($password);
         return $user;
