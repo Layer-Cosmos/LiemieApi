@@ -34,7 +34,7 @@ class AuthController extends Controller
 
         if($auth->hasRefreshToken($this->request, $this->response)) {
             if(!$auth->hasValidRefreshToken($this->request, $this->response)) {
-                throw new HttpException("Unauthorized", 401);
+                throw new HttpException("Token expired/invalid ", 498);
             }
         } else {
             throw new HttpException("Unauthorized", 401);
@@ -44,6 +44,10 @@ class AuthController extends Controller
     }
 
     private function getUser() {
-        return UserEntity::build($this->request->getContents()->mail, $this->request->getContents()->password);
+        if(isset($this->request->getContents()->mail) && isset($this->request->getContents()->password)) {
+            return UserEntity::build($this->request->getContents()->mail, $this->request->getContents()->password);
+        }
+        return UserEntity::build("", "");
+
     }
 }

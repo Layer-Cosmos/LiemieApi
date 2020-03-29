@@ -51,11 +51,25 @@ class Authentication
         return false;
     }
 
+    public function hasValidTokenFormat(Request $request) : bool {
+        try {
+            $token = JWT::decode($request->getToken(), "Liemie", array('HS256'));
+        } catch (\Exception $e) {
+            if($e->getMessage() == "Wrong number of segments") {
+                return false;
+            }
+            if($e->getMessage() == "Malformed UTF-8 characters") {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function hasValidRefreshToken(Request $request, Response $response) {
         $refreshToken = $request->getRefreshToken();
 
         $pdo = new Database("api");
-        if($request->hasToken()) {
+        if($request->hasToken() && $this->hasValidTokenFormat($request)) {
             $body = $this->decodeJwt($request->getToken());
 
             $user = new UserEntity();
@@ -81,8 +95,9 @@ class Authentication
         $token = [
             'user_id' => $this->user->getId(),
             'user_mail' => $this->user->getMail(),
-            'exp' => time() + 900
+            'exp' => time() + 30
         ];
+
 
         $token = JWT::encode($token, $key);
 
